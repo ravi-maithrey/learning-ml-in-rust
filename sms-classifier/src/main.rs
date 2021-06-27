@@ -13,6 +13,7 @@ fn download(url: &str) -> Vec<u8>{ // fn to download the data
 }
 
 fn unzip(zip_file: Vec<u8>) -> String{
+    // cursor wraps an in-memory buffer to give it a seek implementation. since that is where our downloaded file is we use cursor to unwrap our zip
     let mut archive = ZipArchive::new(Cursor::new(zip_file)).unwrap(); // create an object to read the zip file
     let mut file = archive.by_name("SMSSpamCollection").unwrap(); //SMSSpamCollection is the name of the required file within the zip
     
