@@ -1,6 +1,8 @@
 #![allow(non_snake_case)]
-use std::io::Read;
+use std::io::{Cursor, Read}; // the reader used in downloading the data
 use reqwest::blocking;// use reqwest::blocking::get to get the dataset
+use zip::read::ZipArchive;
+
 
 fn download(url: &str) -> Vec<u8>{ // fn to download the data
     let mut response = blocking::get(url).unwrap(); //get synchronous http data from url
@@ -9,6 +11,22 @@ fn download(url: &str) -> Vec<u8>{ // fn to download the data
 
     data // return the data
 }
+
+fn unzip(zip_file: Vec<u8>) -> String{
+    let mut archive = ZipArchive::new(Cursor::new(zip_file)).unwrap(); // create an object to read the zip file
+    let mut file = archive.by_name("SMSSpamCollection").unwrap(); //SMSSpamCollection is the name of the required file within the zip
+    
+    let mut data = String::new();
+    file.read_to_string(&mut data).unwrap(); // unwrapping the file into a string
+
+    data
+}
 fn main() {
-    println!("Hello, world!");
+    let zipped = download("https://archive.ics.uci.edu/ml/machine-learning-databases/00228/smsspamcollection.zip");
+    let raw_data = unzip(zipped);
+
+    for line in raw_data.lines().take(3) {
+        println!("{}", line); // sanity check to see if everything worked
+    }
+
 }
